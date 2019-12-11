@@ -62,7 +62,7 @@ similar_img_arr = []
 for i, similar_imgs in enumerate(cosine_similar_imgs):
 	if i % 10 == 0:
 		print("finding similar images, done " + str(i) + " out of " + str(len(image_files)))
-	similar_img_arr.append([(sim, image_files[i][2:]) for j, sim in enumerate(similar_imgs)])
+	similar_img_arr.append([(sim, image_files[j][2:]) for j, sim in enumerate(similar_imgs)])
 
 top_similar_imgs = [sorted(k, reverse=True)[1:6] for k in similar_img_arr]
 
