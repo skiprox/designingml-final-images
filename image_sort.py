@@ -81,7 +81,7 @@ for i, (img, cluster_pos, closest_imgs) in enumerate(zip(image_files, embedding_
 
 import json
 
-with open('image_umap_position.json', 'w') as outfile:
+with open('image_umap_positions.json', 'w') as outfile:
 	json.dump(lookup, outfile)
 
 
