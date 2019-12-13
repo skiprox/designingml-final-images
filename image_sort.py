@@ -3,7 +3,6 @@ import tensorflow.keras as keras
 from tensorflow.keras.preprocessing import image
 from tensorflow.keras.applications.imagenet_utils import preprocess_input
 from tensorflow.keras.models import Model
-
 model = keras.applications.VGG19(weights='imagenet', include_top=True)
 feature_extractor = Model(inputs=model.input, outputs=model.get_layer('fc2').output)
 
@@ -11,7 +10,6 @@ feature_extractor = Model(inputs=model.input, outputs=model.get_layer('fc2').out
 # Now we're bringing the images in, randomizing the order (for no real reason)
 import glob
 import random
-
 image_files = glob.glob('./images/*.jpg', recursive=True)
 random.shuffle(image_files)
 image_files = image_files[:len(image_files)]
@@ -20,7 +18,6 @@ image_files = image_files[:len(image_files)]
 # Creating an array of features
 import numpy as np
 features = []
-
 for i, image_path in enumerate(image_files):
 	if i % 10 == 0:
 		print("analyzed " + str(i) + " out of " + str(len(image_files)))
@@ -32,16 +29,14 @@ for i, image_path in enumerate(image_files):
 	features.append(feat)
 
 
-# Importing standardscaler and creating a scaled array of features
+# Importing standardscaler and creating a scaled array of features, scaled
 from sklearn.preprocessing import StandardScaler
-
 ss = StandardScaler()
 scaled = ss.fit_transform(features)
 
 
 # Creating an embedding from the scaled features
 import umap.umap_ as umap
-
 embedding = umap.UMAP().fit_transform(scaled)
 
 
@@ -56,21 +51,18 @@ embedding_scaled = scaler.transform(embedding)
 # for every image in our image_files array
 from sklearn.metrics.pairwise import cosine_similarity
 cosine_similar_imgs = cosine_similarity(scaled)
-
 similar_img_arr = []
-
 for i, similar_imgs in enumerate(cosine_similar_imgs):
 	if i % 10 == 0:
 		print("finding similar images, done " + str(i) + " out of " + str(len(image_files)))
 	similar_img_arr.append([(sim, image_files[j][2:]) for j, sim in enumerate(similar_imgs)])
-
 top_similar_imgs = [sorted(k, reverse=True)[1:6] for k in similar_img_arr]
 bottom_similar_imgs = [sorted(k, reverse=False)[0:5] for k in similar_img_arr]
 
 
 # Creating a JSON file
+import json
 lookup = []
-
 for i, (img, cluster_pos, closest_imgs, furthest_imgs) in enumerate(zip(image_files, embedding_scaled, top_similar_imgs, bottom_similar_imgs)):
 	if i % 10 == 0:
 		print("creating JSON, done " + str(i) + " out of " + str(len(image_files)))
@@ -80,16 +72,12 @@ for i, (img, cluster_pos, closest_imgs, furthest_imgs) in enumerate(zip(image_fi
 		"closest_imgs": closest_imgs,
 		"furthest_imgs": furthest_imgs
 	})
-
-import json
-
 with open('image_umap_positions.json', 'w') as outfile:
 	json.dump(lookup, outfile)
 
 
 # Subprocess to resize images
 import subprocess
-
 print("Starting subprocess, to resize images")
 subprocess.call(['./resize_images.sh'])
 
