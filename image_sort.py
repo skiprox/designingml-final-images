@@ -65,18 +65,20 @@ for i, similar_imgs in enumerate(cosine_similar_imgs):
 	similar_img_arr.append([(sim, image_files[j][2:]) for j, sim in enumerate(similar_imgs)])
 
 top_similar_imgs = [sorted(k, reverse=True)[1:6] for k in similar_img_arr]
+bottom_similar_imgs = [sorted(k, reverse=False)[0:5] for k in similar_img_arr]
 
 
 # Creating a JSON file
 lookup = []
 
-for i, (img, cluster_pos, closest_imgs) in enumerate(zip(image_files, embedding_scaled, top_similar_imgs)):
+for i, (img, cluster_pos, closest_imgs, furthest_imgs) in enumerate(zip(image_files, embedding_scaled, top_similar_imgs, bottom_similar_imgs)):
 	if i % 10 == 0:
 		print("creating JSON, done " + str(i) + " out of " + str(len(image_files)))
 	lookup.append({
 		"filename": img.replace('./', ''),
 		"cluster_pos": cluster_pos.tolist(),
-		"closest_imgs": closest_imgs
+		"closest_imgs": closest_imgs,
+		"furthest_imgs": furthest_imgs
 	})
 
 import json
